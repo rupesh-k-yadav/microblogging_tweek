@@ -24,6 +24,28 @@ class MicropostsController < ApplicationController
           redirect_to request.referrer
         end
     end
+    
+    def share
+        mp = Micropost.find(params[:id])
+        content = mp.content
+        @micropost = current_user.microposts.build(content: content)
+        # @micropost.image.attach(mp.image) if mp.image 
+
+        if @micropost.save
+            flash[:success] = "Successfully shared the feed"
+        else
+            flash[:danger] = "Could not share the feed."
+        end
+        redirect_to root_url
+    end
+    
+    def likedby
+        @title = "LikedBy"
+        #@user = current_user
+        mp = Micropost.find(params[:id])
+        @users = User.find(mp.likes.map(&:user_id))
+        render 'likedby'
+    end
 
     private
     def micropost_params
